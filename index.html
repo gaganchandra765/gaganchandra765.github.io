@@ -1,8 +1,251 @@
-<html>
-<head><title>Hello!</title></head>
+
+<!--
+Sleek Personal Portfolio + Blog + Project Display
+Single-file React + Tailwind (usable as index.html). 
+Usage:
+ 1. Save this file as `index.html` in a new GitHub repo.
+ 2. Push to GitHub and enable GitHub Pages (branch: main / root). 
+ 3. Edit content inside the `initialData` object in the script to add your name, projects, and blog posts.
+
+Notes:
+ - This uses React + ReactDOM via CDN and Babel for JSX in-browser (small-scale demos).
+ - Tailwind is used via CDN for quick styling. For production, convert to a proper React app and build pipeline.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio — Your Name</title>
+  <meta name="description" content="Personal portfolio, blog and project showcase" />
+
+  <!-- Tailwind CDN (for quick demos) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --glass: rgba(255,255,255,0.06); --accent: #7c3aed; }
+    html,body,#root { height: 100%; }
+    body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.07), transparent 6%), radial-gradient(900px 400px at 90% 90%, rgba(6,95,70,0.03), transparent), #0f172a; color: #e6eef8; }
+    .glass { background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.04); }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(2,6,23,0.6); }
+    .markdown p { color: #cde3ff; }
+  </style>
+</head>
 <body>
-  <h1>Hi, I’m Gagan 👋</h1>
-  <p>Welcome to my personal site. AI and Math are my interests.</p><hr>
-  <p>Work under construction ...</p>
+  <div id="root"></div>
+
+  <!-- React + Babel (for single-file) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // === EDIT THIS: initial content ===
+    const initialData = {
+      name: 'Gagan',
+      title: 'Math & AI tinkerer — building neat ideas',
+      avatar: '', // put an image URL or leave blank for initials
+      about: `I like building research-grade projects, doing math that stings the brain, and making clean software. This site is a simple hub for projects, posts, and contact info.`,
+      socials: [
+        { name: 'GitHub', url: 'https://github.com/your-username' },
+        { name: 'LinkedIn', url: 'https://linkedin.com/in/your-username' },
+        { name: 'Email', url: 'mailto:you@example.com' }
+      ],
+      projects: [
+        { id: 1, title: 'GeoRoute++', tags: ['C++','Pathfinding','Simulation'], desc: 'Terrain-aware route planner with A* heuristics and elevation modeling.', link: '#' },
+        { id: 2, title: 'MAB Research', tags: ['Theory','RL','Paper'], desc: 'Sequential testing for Markovian bandits — stopping rules & bounds.', link: '#' }
+      ],
+      posts: [
+        { id: 1, title: 'How I think about integrals', date: '2025-08-01', excerpt: 'A handful of tricks I use when approaching weird integrals.', link: '#' },
+        { id: 2, title: 'Design notes for GeoRoute++', date: '2025-07-15', excerpt: 'Architecture, data formats and performance tips.', link: '#' }
+      ]
+    };
+    // === end editable content ===
+
+    function IconArrow() { return (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="inline-block ml-1"><path d="M5 12h14M13 5l6 7-6 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>); }
+
+    function Nav({ onNav }){
+      return (
+        <nav className="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-2xl font-bold text-white">{initialData.name}</div>
+            <div className="text-xs px-2 py-1 rounded-full glass text-sky-200">portfolio</div>
+          </div>
+          <div className="hidden md:flex gap-4 items-center text-sm text-slate-200">
+            <button onClick={()=>onNav('projects')} className="hover:text-white">Projects</button>
+            <button onClick={()=>onNav('blog')} className="hover:text-white">Blog</button>
+            <button onClick={()=>onNav('about')} className="hover:text-white">About</button>
+            <a href="#contact" className="ml-4 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-500 text-white text-sm">Contact</a>
+          </div>
+        </nav>
+      );
+    }
+
+    function Hero({ onNav }){
+      return (
+        <header className="max-w-6xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1">
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">{initialData.name}<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-violet-400">.</span></h1>
+            <p className="mt-4 text-lg text-slate-200 max-w-2xl">{initialData.title}</p>
+            <p className="mt-4 text-slate-300 max-w-xl">{initialData.about}</p>
+            <div className="mt-6 flex gap-3">
+              <button onClick={()=>onNav('projects')} className="px-4 py-2 rounded-md bg-white/6 backdrop-blur-sm border border-white/6">View Projects</button>
+              <a href="#contact" className="px-4 py-2 rounded-md bg-gradient-to-r from-violet-600 to-indigo-500 text-white">Get in touch</a>
+            </div>
+            <div className="mt-6 flex gap-3 text-sm text-slate-300">
+              {initialData.socials.map(s => (
+                <a key={s.name} href={s.url} className="glass px-3 py-2 rounded-md hover:scale-105 transition-transform">{s.name}</a>
+              ))}
+            </div>
+          </div>
+          <div className="w-56 h-56 md:w-72 md:h-72 flex items-center justify-center glass rounded-2xl">
+            {initialData.avatar ? (
+              <img src={initialData.avatar} alt="avatar" className="w-full h-full object-cover rounded-xl" />
+            ) : (
+              <div className="text-6xl font-bold text-white">{initialData.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+            )}
+          </div>
+        </header>
+      );
+    }
+
+    function ProjectCard({ p }){
+      return (
+        <article className="glass p-5 rounded-2xl shadow-sm transform transition-all duration-200 card-hover">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-xl font-semibold">{p.title}</h3>
+              <p className="mt-2 text-slate-300 text-sm">{p.desc}</p>
+            </div>
+            <div className="text-sm text-slate-400">{p.tags.map(t=> <span key={t} className="inline-block ml-2">#{t}</span>)}</div>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <a href={p.link} className="text-sm text-indigo-200 hover:underline">See project <IconArrow /></a>
+            <div className="text-xs text-slate-400">Updated • recently</div>
+          </div>
+        </article>
+      );
+    }
+
+    function BlogCard({ post }){
+      return (
+        <article className="glass p-4 rounded-xl">
+          <div className="flex justify-between items-start">
+            <div>
+              <h4 className="font-semibold">{post.title}</h4>
+              <p className="text-slate-300 text-sm mt-1">{post.excerpt}</p>
+            </div>
+            <div className="text-xs text-slate-400">{post.date}</div>
+          </div>
+          <div className="mt-3"><a href={post.link} className="text-indigo-200 text-sm hover:underline">Read →</a></div>
+        </article>
+      );
+    }
+
+    function SectionProjects(){
+      return (
+        <section id="projects" className="max-w-6xl mx-auto px-6 py-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Selected Projects</h2>
+            <a href="#" className="text-sm text-slate-300">View all projects</a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {initialData.projects.map(p => <ProjectCard key={p.id} p={p} />)}
+          </div>
+        </section>
+      );
+    }
+
+    function SectionBlog(){
+      return (
+        <section id="blog" className="max-w-6xl mx-auto px-6 py-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Latest Posts</h2>
+            <a href="#" className="text-sm text-slate-300">All posts</a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {initialData.posts.map(post => <BlogCard key={post.id} post={post} />)}
+          </div>
+        </section>
+      );
+    }
+
+    function SectionAbout(){
+      return (
+        <section id="about" className="max-w-6xl mx-auto px-6 py-12">
+          <h2 className="text-2xl font-bold mb-4">About</h2>
+          <div className="glass p-6 rounded-2xl">
+            <div className="markdown">
+              <p>{initialData.about}</p>
+              <p className="mt-3 text-slate-300">Things I tinker with: math, algorithms, ML, and projects that are a little too ambitious for their own good.</p>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function Contact(){
+      return (
+        <section id="contact" className="max-w-6xl mx-auto px-6 py-12">
+          <h2 className="text-2xl font-bold mb-4">Contact</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <form className="glass p-6 rounded-2xl" onSubmit={(e)=>{e.preventDefault(); alert('Form submitted — replace with form endpoint or mailto handler.')}}>
+              <label className="block text-sm text-slate-300">Name</label>
+              <input className="mt-2 w-full rounded-md p-2 bg-transparent border border-white/6" required />
+              <label className="block text-sm text-slate-300 mt-4">Email</label>
+              <input className="mt-2 w-full rounded-md p-2 bg-transparent border border-white/6" type="email" required />
+              <label className="block text-sm text-slate-300 mt-4">Message</label>
+              <textarea className="mt-2 w-full rounded-md p-2 bg-transparent border border-white/6 h-28" required/>
+              <div className="mt-4"><button className="px-4 py-2 rounded-md bg-gradient-to-r from-violet-600 to-indigo-500">Send</button></div>
+            </form>
+            <div className="flex flex-col gap-4">
+              <div className="glass p-6 rounded-2xl"> <h3 className="font-semibold">Email</h3><p className="text-slate-300 mt-2">you@example.com</p></div>
+              <div className="glass p-6 rounded-2xl"> <h3 className="font-semibold">Location</h3><p className="text-slate-300 mt-2">India</p></div>
+              <div className="glass p-6 rounded-2xl"> <h3 className="font-semibold">Availability</h3><p className="text-slate-300 mt-2">Open to research & collaboration</p></div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function Footer(){
+      return (
+        <footer className="max-w-6xl mx-auto px-6 py-8 text-slate-400">
+          <div className="flex items-center justify-between">
+            <div>© {new Date().getFullYear()} {initialData.name}. Built with ❤️ and too much coffee.</div>
+            <div className="flex gap-3">
+              {initialData.socials.map(s => <a key={s.name} href={s.url} className="text-sm hover:underline">{s.name}</a>)}
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    function App(){
+      const [view, setView] = useState('home');
+      useEffect(()=>{ if (location.hash) { const h = location.hash.replace('#',''); setView(h); } },[]);
+      useEffect(()=>{ if (view==='projects') location.hash='projects'; if (view==='blog') location.hash='blog'; if (view==='about') location.hash='about'; if (view==='home') location.hash=''; },[view]);
+
+      return (
+        <div>
+          <Nav onNav={(v)=>setView(v)} />
+          <main>
+            <Hero onNav={(v)=>setView(v)} />
+            <SectionProjects />
+            <SectionBlog />
+            <SectionAbout />
+            <Contact />
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
